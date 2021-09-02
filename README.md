@@ -1,7 +1,9 @@
 # NodeJs-Mongo-OperationDemo
-This is a demo, showing how to manager mongoDB by NodeJs.
+This is a demo, showing how to manager（add、delete、update、search） mongoDB by NodeJs.
 
 You can extend it by your need!
+
+You can also visit https://blog.csdn.net/qq_37437983/article/details/111875519 for detail info
 
 
 依赖包: nodejs-websocket、mongodb、express；　
