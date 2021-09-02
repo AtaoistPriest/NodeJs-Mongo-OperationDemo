@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>MongoDB　Demo</title>
+    <style type="text/css" rel="stylesheet">
+        table{
+            width: 60%;
+            margin-left: 19%;
+            text-align: center;
+            font-size: 20px;
+        }
+        td{
+            border: #325e8c solid 1px;
+        }
+        .td:hover{
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <table id="operation">
+        <tr height="65px">
+            <td>
+                <input type="text" id="text" height="60%">
+            </td>
+            <td><p onclick="plus()" class="td">增加</p></td>
+        </tr>
+    </table>
+    <table id = "list">
+    </table>
+    <script type="text/javascript" src = "jquery.min.js"></script>
+    <script type="text/javascript">
+        //使用websocket协议进行消息的交互,服务器端口为8081
+        var socket = new WebSocket('ws://localhost:8081');
+        setTimeout("main()",200);
+        //发送消息到服务器
+        function send(message) {
+            socket.send(message);
+        }
+        //接收服务器端的消息
+        socket.onmessage = function(e) {
+            var data = e.data;
+            //解析json
+            var datas = JSON.parse(data);
+            //设置处理延迟，网址网络波动以致消息未到。switchResponse为消息处理函数。
+            setTimeout(switchResponse(datas),500);
+        }
+        function main() {
+            message = "{\"type\":\"main\",\"message\":\"\"}";
+            //alert(message);
+            send(message);
+        }
+        //处理服务器端发送来的数据，显示在前端
+        function switchResponse(datas) {
+            //动态装载入表格
+            table = document.getElementById("list");
+            table.innerHTML = "";
+            str = "<tr><td width='25%'>日期</td><td width='45%'>文本</td><td colspan='2'>操作</td></tr>"
+            datas.forEach(function (data) {
+                //获得数据库文本信息，日期和文本
+                date = data['date'];
+                message = data['message'];
+                str += "<tr><td>"+date+"</td><td>"+message+"</td><td onclick='update(\""+date+"\")' class='td'>更新</td><td onclick='del(\""+date+"\")' class='td'>删除</td></tr>"
+            })
+            table.innerHTML = str;
+        }
+        //新增函数
+        function plus() {
+            text = $("#text").val();
+            date = new Date();
+            confirmDate = date.getFullYear()+"-"+date.getMonth()+"-"+date.getDay()+" "+date.getHours()+"."+date.getMinutes()+"."+date.getSeconds();
+            message = "{\"type\":\"add\",\"message\":\""+text+"\",\"date\":\""+confirmDate+"\"}";
+            send(message);
+            setTimeout("main()",200);
+        }
+
+        //更新
+        function update(date) {
+            text = $("#text").val();
+            message = "{\"type\":\"update\",\"date\":\""+date+"\",\"message\":\""+text+"\"}";
+            send(message);
+            setTimeout("main()",200);
+        }
+        //删除
+        function del(date) {
+            message = "{\"type\":\"delete\",\"date\":\""+date+"\"}";
+            send(message);
+            setTimeout("main()",200);
+        }
+    </script>
+</body>
+
+</html>
